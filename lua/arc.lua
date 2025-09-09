@@ -8,7 +8,10 @@ function M.setup(opts)
     }
     opts = vim.tbl_deep_extend('force', default_opts, opts or {})
 
-    print("hello, ARC_ROOT="..opts.arc_root)
+    M.result = {
+        opts = opts,
+        cwd = debug.getinfo(1).source:sub(2)
+    }
 end
 
 return M
