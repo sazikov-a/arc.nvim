@@ -36,7 +36,7 @@ def main() -> int:
     result = subprocess.check_output(cli_command, stderr=subprocess.DEVNULL)
 
     lines = parse_result(result)
-    fixed_lines = fix_output_lines(lines, ars.current_folder)
+    fixed_lines = fix_output_lines(lines, args.current_folder)
 
     print('\n'.join(fixed_lines))
 

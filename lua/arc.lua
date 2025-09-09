@@ -7,7 +7,6 @@ local cs_wrapper = function()
 end
 
 local cs_grep_command = function(pattern, opts)
-    print(cs_wrapper())
     local cmd = {'python3', cs_wrapper()}
 
     if opts.no_junk then
