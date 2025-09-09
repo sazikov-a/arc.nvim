@@ -59,15 +59,45 @@ local arc_grep = function(opts, pick_chooser)
     end
 end
 
-local setup_arc_grep = function(opts)
-    local grep_opts = opts
-    local local_grep_opts = opts
+local arc_grep_live = function(opts, pick_chooser)
+    return function(local_opts)
+        local_opts = vim.tbl_deep_extend('force', {
+            source = {
+                name = 'Live Grep (ya cs)',
+                choose = function(item)
+                    return MiniPick.default_choose(pick_chooser(item, opts.arc_root))
+                end
+            }
+        }, local_opts or {})
 
-    grep_opts.grep.local_only = false
-    local_grep_opts.grep.local_only = true
+        local set_items_opts, spawn_opts = { do_match = false, querytick = MiniPick.get_querytick()}, { cwd = vim.fn.getcwd() }
+        local process
+
+        local match = function(_, _, query)
+            pcall(vim.loop.process_kill, process)
+            if MiniPick.get_querytick() == set_items_opts.querytick then return end
+            if #query == 0 then return MiniPick.set_picker_items({}, set_items_opts) end
+
+            set_items_opts.querytick = MiniPick.get_querytick()
+            local command = cs_grep_command(table.concat(query), opts.grep)
+            process = MiniPick.set_picker_items_from_cli(command, { set_items_opts = set_items_opts, spawn_opts = spawn_opts })
+        end
+
+        local_opts = vim.tbl_deep_extend('force', local_opts, { source = { items = {}, match = match }, mappings = {} })
+
+        return MiniPick.start(local_opts)
+    end
+end
+
+local setup_arc_grep = function(opts)
+    local grep_opts = vim.tbl_extend('force', { grep = { local_only = false } }, opts)
+    local local_grep_opts = vim.tbl_extend('force', { grep = { local_only = true } }, opts)
 
     MiniPick.registry.arc_grep = arc_grep(grep_opts, pick_choose)
     MiniPick.registry.local_arc_grep = arc_grep(local_grep_opts, local_pick_choose)
+
+    MiniPick.registry.arc_grep_live = arc_grep_live(grep_opts, pick_choose)
+    MiniPick.registry.local_arc_grep_live = arc_grep_live(local_grep_opts, local_pick_choose)
 end
 
 local M = {}
