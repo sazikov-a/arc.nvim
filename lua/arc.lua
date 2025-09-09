@@ -41,13 +41,17 @@ local pick_choose = function(item, arc_root)
     end
 end
 
-local arc_grep = function(opts)
+local local_pick_choose = function(item, arc_root)
+    return item
+end
+
+local arc_grep = function(opts, pick_chooser)
     return function(local_opts)
         local_opts = vim.tbl_deep_extend('force', {
             source = {
                 name = 'Grep (ya cs)',
                 choose = function(item)
-                    return MiniPick.default_choose(pick_choose(item, opts.arc_root))
+                    return MiniPick.default_choose(pick_chooser(item, opts.arc_root))
                 end
             }
         }, local_opts or {})
@@ -64,8 +68,8 @@ local setup_arc_grep = function(opts)
     grep_opts.grep.local_only = false
     local_grep_opts.grep.local_only = true
 
-    MiniPick.registry.arc_grep = arc_grep(grep_opts)
-    MiniPick.registry.local_arc_grep = arc_grep(local_grep_opts)
+    MiniPick.registry.arc_grep = arc_grep(grep_opts, pick_choose)
+    MiniPick.registry.local_arc_grep = arc_grep(local_grep_opts, local_pick_choose)
 end
 
 local M = {}
