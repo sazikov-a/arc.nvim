@@ -127,6 +127,10 @@ function M.setup_mini_pick(opts)
     setup_arc_grep(opts)
 end
 
+function M.root()
+    return M.opts.arc_root
+end
+
 function M.setup(opts)
     local default_opts = {
         arc_root = default_arc_root,
