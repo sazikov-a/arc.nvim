@@ -41,11 +41,7 @@ local pick_choose = function(item, arc_root)
 end
 
 local local_pick_choose = function(item, arc_root)
-    if type(item) == 'string' and starts_with(item, arc_prefix) then
-        return string.sub(item, string.len(arc_prefix) + 2)
-    else
-        return item
-    end
+    return item
 end
 
 local arc_grep = function(opts, pick_chooser)

@@ -36,7 +36,7 @@ def main() -> int:
     result = subprocess.check_output(cli_command, stderr=subprocess.DEVNULL)
 
     lines = parse_result(result)
-    fixed_lines = fix_output_lines(lines)
+    fixed_lines = fix_output_lines(lines, ars.current_folder)
 
     print('\n'.join(fixed_lines))
 
@@ -47,7 +47,7 @@ def parse_result(cmd_result: str) -> list[str]:
     return cmd_result.decode(encoding="utf-8").strip().split("\n")
 
 
-def fix_output_lines(lines: list[str]) -> list[str]:
+def fix_output_lines(lines: list[str], current_folder: bool) -> list[str]:
     split_sym = "\0"
 
     def line_fixer(line: str) -> str:
@@ -56,7 +56,10 @@ def fix_output_lines(lines: list[str]) -> list[str]:
         file, line = tokens[0], tokens[1]
         content = ":".join(tokens[2:])
 
-        return split_sym.join([f'$(S)/{file}', line, "0", content])
+        if not current_folder:
+            file = f'$(S)/{file}'
+
+        return split_sym.join([file, line, "0", content])
 
     return list(map(line_fixer, lines))
 
