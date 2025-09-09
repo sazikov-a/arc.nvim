@@ -1,6 +1,18 @@
 local default_arc_root = vim.env.HOME..'/arcadia'
 local arc_prefix = '$(S)'
 
+function table.copy(t)
+  local t2 = {};
+  for k,v in pairs(t) do
+    if type(v) == "table" then
+        t2[k] = table.copy(v);
+    else
+        t2[k] = v;
+    end
+  end
+  return t2;
+end
+
 local cs_wrapper = function()
     local plugin_dir = string.sub(debug.getinfo(1).source, 2, string.len('/lua/arc.lua') * -1)
     return plugin_dir..'scripts/cs_wrapper.py'
@@ -90,13 +102,18 @@ local arc_grep_live = function(opts, pick_chooser)
 end
 
 local setup_arc_grep = function(opts)
-    opts.grep.local_only = false
-    MiniPick.registry.arc_grep = arc_grep(opts, pick_choose)
-    MiniPick.registry.arc_grep_live = arc_grep_live(opts, pick_choose)
+    local grep_opts = table.copy(opts)
+    local local_grep_opts = table.copy(opts)
+
+    grep_opts.grep.local_only = false
+    local_grep_opts.grep.local_only = true
+
+    MiniPick.registry.arc_grep = arc_grep(grep_opts, pick_choose)
+    MiniPick.registry.arc_grep_live = arc_grep_live(grep_opts, pick_choose)
 
     opts.grep.local_only = true
-    MiniPick.registry.local_arc_grep = arc_grep(opts, local_pick_choose)
-    MiniPick.registry.local_arc_grep_live = arc_grep_live(opts, local_pick_choose)
+    MiniPick.registry.local_arc_grep = arc_grep(local_grep_opts, local_pick_choose)
+    MiniPick.registry.local_arc_grep_live = arc_grep_live(local_grep_opts, local_pick_choose)
 end
 
 local M = {}
@@ -122,6 +139,8 @@ function M.setup(opts)
         }
     }
     opts = vim.tbl_deep_extend('force', default_opts, opts or {})
+
+    M.opts = table.copy(opts)
 
     M.setup_mini_pick(opts)
 end
