@@ -10,7 +10,8 @@ function M.setup(opts)
 
     M.result = {
         opts = opts,
-        cwd = string.sub(debug.getinfo(1).source, 2, string.len('/lua/arc.lua') * -1)
+        cwd = string.sub(debug.getinfo(1).source, 2, string.len('/lua/arc.lua') * -1),
+        src = debug.getinfo(1).source
     }
 end
 
