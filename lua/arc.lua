@@ -15,7 +15,7 @@ local cs_grep_command = function(pattern, opts)
         vim.list_extend(cmd, {'--no-contrib'})
     end
 
-    vim.list_extend(cmd, {'--max', opts.max_output, '--', pattern})
+    vim.list_extend(cmd, {'--', pattern})
 end
 
 local starts_with = function(str, prefix)
