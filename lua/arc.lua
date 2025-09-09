@@ -90,14 +90,13 @@ local arc_grep_live = function(opts, pick_chooser)
 end
 
 local setup_arc_grep = function(opts)
-    local grep_opts = vim.tbl_extend('force', { grep = { local_only = false } }, opts)
-    local local_grep_opts = vim.tbl_extend('force', { grep = { local_only = true } }, opts)
+    opts.grep.local_only = false
+    MiniPick.registry.arc_grep = arc_grep(opts, pick_choose)
+    MiniPick.registry.arc_grep_live = arc_grep_live(opts, pick_choose)
 
-    MiniPick.registry.arc_grep = arc_grep(grep_opts, pick_choose)
-    MiniPick.registry.local_arc_grep = arc_grep(local_grep_opts, local_pick_choose)
-
-    MiniPick.registry.arc_grep_live = arc_grep_live(grep_opts, pick_choose)
-    MiniPick.registry.local_arc_grep_live = arc_grep_live(local_grep_opts, local_pick_choose)
+    opts.grep.local_only = true
+    MiniPick.registry.local_arc_grep = arc_grep(opts, local_pick_choose)
+    MiniPick.registry.local_arc_grep_live = arc_grep_live(opts, local_pick_choose)
 end
 
 local M = {}
