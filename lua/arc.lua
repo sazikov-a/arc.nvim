@@ -16,7 +16,7 @@ local cs_grep_command = function(pattern, opts)
         vim.list_extend(cmd, {'--no-contrib'})
     end
 
-    vim.list_extend(cmd, {'--max', opts.max_output, '--', pattern})
+    vim.list_extend(cmd, {'--max='..opts.max_output, '--', pattern})
 
     return cmd
 end
@@ -35,8 +35,8 @@ local pick_choose = function(item, arc_root)
     end
 end
 
-local setup_arc_grep = function(opts)
-    MiniPick.registry.arc_grep = function(local_opts)
+local arc_grep = function(opts)
+    return function(local_opts)
         local_opts = vim.tbl_deep_extend('force', {
             source = {
                 name = 'Grep (ya cs)',
@@ -49,6 +49,17 @@ local setup_arc_grep = function(opts)
         local pattrern = type(local_opts.pattern) == 'string' and local_opts.pattern or vim.fn.input('Grep pattern: ')
         return MiniPick.builtin.cli({ command = cs_grep_command(pattrern, opts.grep) }, local_opts)
     end
+end
+
+local setup_arc_grep = function(opts)
+    local grep_opts = opts
+    local local_grep_opts = opts
+
+    grep_opts.grep.local_only = false
+    local_grep_opts.grep.local_only = true
+
+    MiniPick.registry.arc_grep = arc_grep(grep_opts)
+    MiniPick.registry.local_arc_grep = arc_grep(local_grep_opts)
 end
 
 local M = {}
@@ -68,7 +79,8 @@ function M.setup(opts)
         grep = {
             no_junk = true,
             no_contrib = true,
-            max_output = 100
+            max_output = 100,
+            local_only = false
         }
     }
     opts = vim.tbl_deep_extend('force', default_opts, opts or {})
