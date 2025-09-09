@@ -15,6 +15,12 @@ local cs_grep_command = function(pattern, opts)
     if opts.no_contrib then
         vim.list_extend(cmd, {'--no-contrib'})
     end
+    if opts.local_only then
+        vim.list_extend(cmd, {'--current-folder'})
+    end
+    if opts.whole_words then
+        vim.list_extend(cmd, {'--whole-words'})
+    end
 
     vim.list_extend(cmd, {'--max='..opts.max_output, '--', pattern})
 
@@ -80,7 +86,8 @@ function M.setup(opts)
             no_junk = true,
             no_contrib = true,
             max_output = 100,
-            local_only = false
+            local_only = false,
+            whole_words = false
         }
     }
     opts = vim.tbl_deep_extend('force', default_opts, opts or {})
