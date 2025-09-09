@@ -1,4 +1,5 @@
 local default_arc_root = vim.env.HOME..'/arcadia'
+local arc_prefix = '$(S)'
 
 local cs_wrapper = function()
     local plugin_dir = string.sub(debug.getinfo(1).source, 2, string.len('/lua/arc.lua') * -1)
@@ -32,17 +33,19 @@ local starts_with = function(str, prefix)
 end
 
 local pick_choose = function(item, arc_root)
-    local prefix = '$(S)'
-
-    if type(item) == 'string' and starts_with(item, prefix) then
-        return arc_root..string.sub(item, string.len(prefix) + 1)
+    if type(item) == 'string' and starts_with(item, arc_prefix) then
+        return arc_root..string.sub(item, string.len(arc_prefix) + 1)
     else
         return item
     end
 end
 
 local local_pick_choose = function(item, arc_root)
-    return item
+    if type(item) == 'string' and starts_with(item, arc_prefix) then
+        return string.sub(item, string.len(arc_prefix) + 2)
+    else
+        return item
+    end
 end
 
 local arc_grep = function(opts, pick_chooser)
